@@ -3,47 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otimizador de Lotes PCP (NSF)</title>
+    <title>NSF | Otimizador de Lotes PCP</title>
     <link rel="stylesheet" href="styles.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>⚙️ Otimizador de Lotes de Produção</h1>
-        <p>Faça o upload da sua planilha (CSV ou XLSX) para processar os lotes.</p>
+        <header>
+            <h1 class="logo">NSF</h1>
+            <h1>Otimizador de Lotes | PCP</h1>
+        </header>
 
-        <input type="file" id="excelFileInput" accept=".xlsx, .csv" />
+        <section class="card upload-section">
+            <h2>Passo 1: Carregar Dados</h2>
+            <p>Selecione a planilha de pedidos da semana (.xlsx ou .csv) e processe para agrupar os lotes.</p>
 
-        <button onclick="processarPlanilha()" disabled id="processButton">
-            1. Processar Planilha
-        </button>
-
-        <div id="statusMessage" class="status"></div>
-
-        <div id="downloadSection" style="display:none; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc;">
-            <h2>2. Baixar Relatórios</h2>
+            <div class="input-group">
+                <input type="file" id="excelFileInput" accept=".xlsx, .csv" class="file-input" />
+                <button onclick="processarPlanilha()" disabled id="processButton" class="btn btn-primary">
+                    <span id="processButtonText">Processar Planilha</span>
+                </button>
+            </div>
             
-            <h3>Opção A: Resumo Geral (Agrupado por Modelo e Material)</h3>
-            <button onclick="exportarRelatorio('geral', 'xlsx')">Download Resumo (XLSX)</button>
-            <button onclick="exportarRelatorio('geral', 'pdf')">Download Resumo (PDF)</button>
+            <div id="statusMessage" class="status">Aguardando arquivo...</div>
+        </section>
+
+        <section id="downloadSection" class="card download-section" style="display:none;">
+            <h2>Passo 2: Baixar Relatórios Otimizados</h2>
             
-            <h3>Opção B: Detalhe de Produção (Agrupado com Dimensão)</h3>
-            <p>Lista mais detalhada, ideal para gerar as listas de corte/peças.</p>
-            <button onclick="exportarRelatorio('detalhe', 'xlsx')">Download Detalhe (XLSX)</button>
-            <button onclick="exportarRelatorio('detalhe', 'pdf')">Download Detalhe (PDF)</button>
-            
-            <h3>Opção C: Filtrar por Categoria</h3>
-            <p>Selecione uma categoria para filtrar o relatório Detalhe:</p>
-            <div id="filterButtons">
-                <button onclick="exportarRelatorio('detalhe', 'xlsx', 'AÇOUGUE')">AÇOUGUE</button>
-                <button onclick="exportarRelatorio('detalhe', 'xlsx', 'VERTICAL ALTO')">VERTICAL ALTO</button>
+            <div class="report-group separator">
+                <h3>Opção A: Resumo Geral (Modelo e Material) <span class="tag">Visão Rápida</span></h3>
+                <p>Agrupado por: **Modelo + Material + Categoria.**</p>
+                <div class="btn-row">
+                    <button onclick="exportarRelatorio('geral', 'xlsx')" class="btn btn-secondary">Download Resumo (XLSX)</button>
+                    <button onclick="exportarRelatorio('geral', 'pdf')" class="btn btn-secondary">Download Resumo (PDF)</button>
                 </div>
-        </div>
-        
+            </div>
+            
+            <div class="report-group separator">
+                <h3>Opção B: Detalhe de Produção (Com Dimensão) <span class="tag tag-success">Lista de Corte</span></h3>
+                <p>Agrupado por: **Modelo + Material + Categoria + Dimensão.**</p>
+                <div class="btn-row">
+                    <button onclick="exportarRelatorio('detalhe', 'xlsx')" class="btn btn-success">Download Detalhe (XLSX)</button>
+                    <button onclick="exportarRelatorio('detalhe', 'pdf')" class="btn btn-success">Download Detalhe (PDF)</button>
+                </div>
+            </div>
+            
+            <div class="report-group filter-group">
+                <h3>Opção C: Filtrar por Categoria (Relatório Detalhe) <span class="tag tag-filter">Filtro Rápido</span></h3>
+                <p>Gere a lista de produção filtrada por setores específicos.</p>
+                
+                <div id="filterButtonsContainer" class="filter-buttons-container">
+                    <div id="filterColXLSX" class="filter-col filter-col-xlsx">
+                        <h4>Download XLSX</h4>
+                        </div>
+                    <div id="filterColPDF" class="filter-col filter-col-pdf">
+                        <h4>Download PDF</h4>
+                        </div>
+                </div>
+            </div>
+        </section>
     </div>
-
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
     
     <script src="script.js"></script>
 </body>
