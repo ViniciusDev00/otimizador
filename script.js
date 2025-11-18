@@ -1,5 +1,6 @@
 // ====================================================================================
 // PARTE CRÍTICA: DEFINIÇÃO DE REGRAS DE AGRUPAMENTO
+// Este mapa associa o NOME LIMPO do Modelo a uma LETRA de GRUPO (A, B, C, etc.).
 // ====================================================================================
 const MAPA_MODELO_GRUPO = {
     // === BASEADO NOS 10 GRUPOS FORNECIDOS ANTERIORMENTE ===
@@ -7,8 +8,7 @@ const MAPA_MODELO_GRUPO = {
     // Grupo A (Valp-850 e Variações)
     "VABP-PVT/850": "A", "VABP/850 MA": "A", "VACP-PVT/850": "A", "VACP-PVT/850 MA": "A",
     "VACP/850": "A", "VACP/850 MA": "A", "VAHP-PVT/850 MA": "A", "VAHP/850": "A",
-    "VALP- PVT/850": "A", "VALP-PVT/850": "A", "VALP-PVT/850 MA": "A", "VALP/850": "A", "VABP/850": "A",
-
+    "VALP- PVT/850": "A", "VALP-PVT/850": "A", "VALP-PVT/850 MA": "A", "VALP/850": "A",
 
     // Grupo B (VAH/850)
     "VAH/850": "B",
@@ -25,7 +25,7 @@ const MAPA_MODELO_GRUPO = {
     // Grupo F (VIL-2P/900)
     "VIL-2P/900": "F",
 
-    // Grupo G (VIL-2P/900 CANTO": "G",
+    // Grupo G (VIL-2P/900 CANTO)
     "VIL-2P/900 CANTO": "G",
 
     // Grupo H (VILP-2P/900 e Variações)
@@ -37,22 +37,6 @@ const MAPA_MODELO_GRUPO = {
     // Grupo J (VR-1040 e Variações)
     "VRA1P/1040": "J", "VRA2P/1040": "J", "VRAG (1,25) + VRA2P (2,50)/1040": "J",
     "VRAG/1040": "J", "VRAGR/1040": "J",
-};
-
-// === MAPA DE CORES PARA AGRUPAMENTO ===
-const GRUPO_COLORS = {
-    "A": "E0F7FA", // Azul Claro Suave
-    "B": "F1F8E9", // Verde Menta Suave
-    "C": "FFF3E0", // Âmbar Claro Suave
-    "D": "FBE4E4", // Rosa Claro Suave
-    "E": "E8EAF6", // Índigo Claro Suave
-    "F": "F3E5F5", // Roxo Claro Suave
-    "G": "E1F5FE", // Azul Bebê
-    "H": "FFE0B2", // Laranja Claro
-    "I": "DCF8C6", // Verde Limão
-    "J": "FCE4EC", // Rosa Pastel
-    // Para grupos não mapeados (se o grupo for o próprio nome do modelo limpo)
-    "N/A": "DDDDDD" 
 };
 // ====================================================================================
 
@@ -144,156 +128,72 @@ function selecionarColunas(data, isFiltered) {
 }
 
 /**
- * Adiciona o cabeçalho personalizado (apenas o Título) ao topo da planilha.
+ * Aplica formatação e estilos no XLSX.
  */
-function adicionarCabecalhoPersonalizado(ws, nomeRelatorio, dadosIniciais) {
-    const colunasChave = Object.keys(dadosIniciais[0]);
-    const numColunas = colunasChave.length; 
-    const linhaInicial = 0; // Começa na linha 1 do Excel (índice 0)
-    
-    // Título Principal (Linha 1)
-    const titulo = `RELATÓRIO OTIMIZADO DE LOTES - ${nomeRelatorio} | ${new Date().toLocaleDateString('pt-BR')}`;
-    XLSX.utils.sheet_add_aoa(ws, [[titulo]], { origin: -1 });
-    
-    if (!ws['!merges']) ws['!merges'] = [];
-    ws['!merges'].push({ s: { r: linhaInicial, c: 0 }, e: { r: linhaInicial, c: numColunas - 1 } }); 
-
-    const tituloCell = XLSX.utils.encode_cell({ r: linhaInicial, c: 0 });
-    if (!ws[tituloCell]) ws[tituloCell] = { v: titulo, t: 's' };
-
-    // Layout: Fundo Azul Marinho (003366) e Fonte Maior (16)
-    ws[tituloCell].s = {
-        font: { name: "Arial", sz: 16, bold: true, color: { rgb: "FFFFFF" } }, 
-        alignment: { horizontal: "center", vertical: "center" },
-        fill: { fgColor: { rgb: "003366" } },
-        border: { bottom: { style: "medium", color: { rgb: "000000" } } } 
-    };
-    
-    // Retornamos 1 para indicar que apenas 1 linha (o título) foi adicionada
-    return 1; 
-}
-
-
-/**
- * Aplica formatação e estilos no XLSX. 
- */
-function aplicarFormatoBasico(dados, ws, nomeRelatorio, startRow) {
+function aplicarFormatoBasico(dados, ws) {
     if (dados.length === 0) return;
 
     const colunasChave = Object.keys(dados[0]);
-    const numColunas = colunasChave.length;
-
-    // Range da tabela de dados
-    const range = { 
-        s: { r: startRow, c: 0 }, 
-        e: { r: startRow + dados.length, c: numColunas - 1 } 
-    };
-    ws['!ref'] = XLSX.utils.encode_range(range);
+    const range = XLSX.utils.decode_range(ws['!ref']);
     
-    // 1. Largura das Colunas
     ws['!cols'] = colunasChave.map(colName => {
-        let wch = 25; // Padrão
-        if (colName === 'GRUPO' || colName === 'BOJO') wch = 12; 
-        if (colName === 'DIMENSÃO') wch = 15;
-        if (colName === 'QUANTIDADE TOTAL') wch = 18;
-        if (colName === 'LINHA') wch = 22; 
+        let wch = 20; 
+        if (colName === 'DIMENSÃO' || colName === 'BOJO' || colName === 'GRUPO') wch = 12; 
+        if (colName === 'QUANTIDADE TOTAL') wch = 15;
+        if (colName === 'ALINHAMENTOS') wch = 25; 
         return { wch: wch };
     });
     
-    // 2. Filtro Automático
     ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
     
-    // 3. Estilo do Cabeçalho da Tabela (FUNDO PRETO)
     const headerStyle = {
-        fill: { fgColor: { rgb: "000000" } }, // Fundo Preto
-        font: { bold: true, color: { rgb: "FFFFFF" }, name: "Arial", sz: 10 }, 
+        fill: { fgColor: { rgb: "007bff" } }, 
+        font: { bold: true, color: { rgb: "FFFFFF" } }, 
         alignment: { horizontal: "center", vertical: "center" },
         border: { 
-            top: { style: "medium", color: { rgb: "000000" } }, bottom: { style: "medium", color: { rgb: "FFFFFF" } }, 
-            left: { style: "thin", color: { rgb: "FFFFFF" } }, right: { style: "thin", color: { rgb: "FFFFFF" } } 
+            top: { style: "medium" }, bottom: { style: "medium" }, 
+            left: { style: "thin" }, right: { style: "thin" }
         }
     };
 
-    const centerStyle = { 
-        alignment: { horizontal: "center", vertical: "center" }, 
-        font: { name: "Arial", sz: 10 }
-    };
+    const centerStyle = { alignment: { horizontal: "center", vertical: "center" } };
     
-    // Aplica estilo ao Cabeçalho da Tabela e ao Corpo
     colunasChave.forEach((colName, index) => {
-        // Estilo do Cabeçalho da Tabela
-        const headerAddress = XLSX.utils.encode_cell({ r: range.s.r, c: range.s.c + index });
-        const headerCell = ws[headerAddress];
+        const cellAddress = XLSX.utils.encode_cell({ r: range.s.r, c: range.s.c + index });
         
-        if (headerCell) {
-            headerCell.s = headerStyle;
-            if (typeof headerCell.v !== 'undefined') {
-                headerCell.t = 's';
-            }
+        if (ws[cellAddress]) {
+            ws[cellAddress].s = headerStyle;
         }
 
-        // Estilo do Corpo da Tabela
+        const isNumericOrCode = colName !== 'ALINHAMENTOS'; 
+
         for (let r = range.s.r + 1; r <= range.e.r; r++) {
             const dataCellAddress = XLSX.utils.encode_cell({ r: r, c: range.s.c + index });
-            const dataCell = ws[dataCellAddress];
             
-            // === CORES DOS GRUPOS ===
-            const grupoAddress = XLSX.utils.encode_cell({ r: r, c: 0 });
-            const grupo = (ws[grupoAddress] && ws[grupoAddress].v) || 'N/A';
-            const corGrupo = GRUPO_COLORS[grupo] || GRUPO_COLORS['N/A'];
-            // ========================
-
-            if (dataCell) {
-                const isNumeric = colName === 'QUANTIDADE TOTAL';
-                
-                const cellBorder = { 
-                    border: { 
-                        top: { style: "thin", color: { rgb: "DDDDDD" } }, bottom: { style: "thin", color: { rgb: "DDDDDD" } }, 
-                        left: { style: "thin", color: { rgb: "DDDDDD" } }, right: { style: "thin", color: { rgb: "DDDDDD" } }
-                    }
-                };
-                
-                // Aplica a cor do GRUPO como fundo da linha
-                const fillStyle = { fill: { fgColor: { rgb: corGrupo } } };
-                
-                // Cria o objeto de estilo completo para esta célula
-                dataCell.s = { 
-                    ...centerStyle,
-                    ...cellBorder,
-                    ...fillStyle 
-                };
-
-                // Garante que a célula tem o tipo correto
-                if (isNumeric) {
-                    dataCell.t = 'n'; // Number
-                } else if (typeof dataCell.v !== 'undefined') {
-                    dataCell.t = 's'; // String
+            const cellBorder = { 
+                border: { 
+                    top: { style: "thin" }, bottom: { style: "thin" }, 
+                    left: { style: "thin" }, right: { style: "thin" }
                 }
+            };
+            
+            if (ws[dataCellAddress]) {
+                ws[dataCellAddress].s = { 
+                    ...ws[dataCellAddress].s, 
+                    ...(isNumericOrCode ? centerStyle : {}),
+                    ...cellBorder 
+                };
             }
         }
     });
 }
 
-/**
- * Funçao exportarXLSX (CORRIGIDA PARA COMPACTAÇÃO)
- */
 function exportarXLSX(dadosParaExportar, nomeArquivo, isFiltered) {
     const dadosFinais = selecionarColunas(dadosParaExportar, isFiltered);
     
-    const ws = {}; 
+    const ws = XLSX.utils.json_to_sheet(dadosFinais);
     
-    const nomeRelatorioLimpo = nomeArquivo.replace(/_/g, ' '); 
-    
-    // 1. Adiciona o TÍTULO na linha 1 (índice 0)
-    const totalTitleRows = adicionarCabecalhoPersonalizado(ws, nomeRelatorioLimpo, dadosFinais); 
-    
-    // 2. Os dados (incluindo o cabeçalho da tabela) começam imediatamente após o título (Linha 2, índice 1)
-    // O valor de totalTitleRows agora é 1, garantindo que o START_ROW_DATA seja 1 (Linha 2)
-    const START_ROW_DATA = totalTitleRows; // Deve ser 1
-    XLSX.utils.sheet_add_json(ws, dadosFinais, { origin: START_ROW_DATA, skipHeader: false });
-    
-    // 3. Aplica estilos
-    aplicarFormatoBasico(dadosFinais, ws, nomeRelatorioLimpo, START_ROW_DATA);
+    aplicarFormatoBasico(dadosFinais, ws);
     
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Lotes Produção");
@@ -302,9 +202,6 @@ function exportarXLSX(dadosParaExportar, nomeArquivo, isFiltered) {
     XLSX.writeFile(wb, `${nomeArquivo}_${dataAtual}.xlsx`, { cellStyles: true }); 
 }
 
-/**
- * Funçao exportarPDF (Design mantido)
- */
 function exportarPDF(dadosParaExportar, nomeArquivo, isFiltered) {
     if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
         alert("Erro: Biblioteca PDF não carregada. Verifique os links CDN no index.html.");
@@ -333,25 +230,8 @@ function exportarPDF(dadosParaExportar, nomeArquivo, isFiltered) {
         head: head,
         body: body,
         startY: 20,
-        theme: 'grid', // Tema grid para bordas nítidas
-        styles: { 
-            fontSize: 9, 
-            font: 'helvetica', 
-            textColor: [52, 58, 64] // Texto cinza escuro
-        },
-        headStyles: { 
-            fillColor: [0, 123, 255], // Fundo Azul NSF (Primário)
-            textColor: 255, // Texto Branco
-            fontStyle: 'bold',
-            fontSize: 10
-        }, 
-        alternateRowStyles: {
-            fillColor: [248, 249, 250] // Linhas alternadas em cinza muito claro
-        },
-        bodyStyles: {
-            lineColor: [222, 226, 230], // Cor da linha (cinza claro)
-            lineWidth: 0.1 
-        },
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [0, 123, 255] }, 
         didDrawPage: function (data) {
             doc.setFontSize(14);
             doc.text("Lista Otimizada de Lotes - PCP", data.settings.margin.left, 10);
@@ -422,14 +302,14 @@ function processarPlanilha() {
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             
-            // Lendo a partir da LINHA 6 (índice 5)
+            // Lendo a partir da LINHA 7 (índice 6) para o novo formato
             const range = XLSX.utils.decode_range(worksheet['!ref']);
-            range.s.r = 5; // Linha de início dos dados (Linha 6 da planilha)
+            range.s.r = 6; // Linha de início dos dados
             const newRange = XLSX.utils.encode_range(range);
             
             const rawDataAOA = XLSX.utils.sheet_to_json(worksheet, { header: 1, range: newRange }); 
 
-            // === NOVOS ÍNDICES DE COLUNAS (Base 0) ===
+            // === NOVOS ÍNDICES DE COLUNAS (Base 0 - F=5, G=6, H=7, I=8) ===
             const INDEX_MODELO = 5;      // Coluna F (ALINHAMENTO)
             const INDEX_DIMENSAO = 6;    // Coluna G (DIMENSÃO)
             const INDEX_BOJO = 7;        // Coluna H (BOJO)
@@ -451,25 +331,22 @@ function processarPlanilha() {
                 // 1. Limpeza e Mapeamento
                 const modeloLimpo = limparPrefixoModelo(modeloOriginal);
                 
-                // Adiciona a letra do GRUPO ou o próprio nome do Modelo
-                const grupoLetra = MAPA_MODELO_GRUPO[modeloLimpo] || modeloLimpo;
+                // Atribuição de GRUPO
+                const grupoLetra = mapearModeloEquivalente(modeloLimpo);
                 
                 const categoriaLimpa = limparCategoria(categoriaOriginal); 
-                
-                // Garante que BOJO e DIMENSÃO tenham um valor padrão se vazios ('N/A')
-                const bojoNormalizado = (bojoOriginal || 'N/A').toUpperCase();
-                const dimensaoNormalizada = (dimensaoOriginal || 'N/A').toUpperCase();
+                const bojoNormalizado = bojoOriginal.toUpperCase();
+                const dimensaoNormalizada = dimensaoOriginal.toUpperCase();
 
-
-                // Apenas verifica se o modelo e a categoria estão presentes.
-                if (!modeloLimpo || !categoriaLimpa) return; 
+                if (!modeloLimpo || !bojoNormalizado || !categoriaLimpa || !dimensaoNormalizada) return;
 
                 linhasProcessadas++;
                 todasCategorias.add(categoriaLimpa);
 
-                // CHAVES DE AGRUPAMENTO
-                const chaveGeral = `${modeloLimpo}|${bojoNormalizado}|${categoriaLimpa}|${grupoLetra}`; 
-                const chaveDetalhe = `${modeloLimpo}|${bojoNormalizado}|${categoriaLimpa}|${dimensaoNormalizada}|${grupoLetra}`; 
+                // CHAVES DE AGRUPAMENTO (AGORA SEM O GRUPO NA CHAVE DE CONTAGEM)
+                // A chave é apenas a especificação do produto, o que permite a agregação 81->80.
+                const chaveGeral = `${modeloLimpo}|${bojoNormalizado}|${categoriaLimpa}`;
+                const chaveDetalhe = `${modeloLimpo}|${bojoNormalizado}|${categoriaLimpa}|${dimensaoNormalizada}`; 
 
                 // 1. AGRUPAMENTO GERAL (Resumo)
                 if (lotesGeraisMap[chaveGeral]) {
@@ -509,7 +386,8 @@ function processarPlanilha() {
                  return;
             }
 
-            statusDiv.textContent = `Processamento concluído! Total de itens contados: ${linhasProcessadas}.`;
+            // A contagem é o número de itens lidos, não o número de linhas do relatório.
+            statusDiv.textContent = `Processamento concluído! Total de itens lidos: ${linhasProcessadas}.`;
 
             // 4. Habilita a interface de download
             document.getElementById('downloadSection').style.display = 'block';
