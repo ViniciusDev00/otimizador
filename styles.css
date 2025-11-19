@@ -19,14 +19,17 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--background-color);
     color: #343a40;
-    padding: 20px;
+    padding: 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .container {
     width: 100%;
     max-width: 900px;
+    flex: 1;
+    padding: 20px;
 }
 
 /* Header */
@@ -227,6 +230,21 @@ header h1 {
     color: #004085;
     border: 1px solid #b8daff;
     margin-top: 10px;
+}
+
+/* Footer */
+footer {
+    background-color: var(--card-bg);
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #e9ecef;
+    margin-top: auto;
+}
+
+footer h4 {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
 }
 
 /* Responsiveness */

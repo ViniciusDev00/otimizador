@@ -6,12 +6,12 @@ const MAPA_MODELO_GRUPO = {
 
     // Grupo A (Valp-850 e Variações)
     "VABP-PVT/850": "A", "VABP/850 MA": "A", "VACP-PVT/850": "A", "VACP-PVT/850 MA": "A",
-    "VACP/850": "A", "VACP/850 MA": "A", "VAHP-PVT/850 MA": "A", "VAHP/850": "A",
-    "VALP- PVT/850": "A", "VALP-PVT/850": "A", "VALP-PVT/850 MA": "A", "VALP/850": "A", "VABP/850": "A",
-
+    "VACP/850": "A", "VACP/750": "A", "VACP/850 MA": "A", "VAHP-PVT/850 MA": "A", "VAHP-PVT/850": "A", "VAHP/850": "A",
+    "VALP- PVT/850": "A", "VALP-PVT/850": "A", "VALP-PVT/850 MA": "A", "VALP/850": "A", "VALP/750": "A", "VALP/750 MA": "A", "VABP/850": "A", "VABP/750": "A",
+    "VALP/850 MA": "A", 
 
     // Grupo B (VAH/850)
-    "VAH/850": "B",
+    "VAH/850": "B", "VAL/850": "B",
 
     // Grupo C (VAP/850 e Variações)
     "VAP/850": "C", "VAP/850 MA": "C",
@@ -20,10 +20,10 @@ const MAPA_MODELO_GRUPO = {
     "VCA2P/1040": "D",
 
     // Grupo E (VCAG Complexo)
-    "VCAG (1,25) + VCA2P (2,50)/1040": "E",
+    "VCAG (1,25) + VCA2P (2,50)/1040": "E", "VCAG/1040": "E", "VCAGR (1,25) + VCAG1P (1,25)/1040": "E",
 
     // Grupo F (VIL-2P/900)
-    "VIL-2P/900": "F",
+    "VIL-2P/900": "F", "VIL-2P CENTRAL/1760": "F", "VIL-2P FRONTAL/900": "F",
 
     // Grupo G (VIL-2P/900 CANTO": "G",
     "VIL-2P/900 CANTO": "G",
@@ -32,25 +32,48 @@ const MAPA_MODELO_GRUPO = {
     "VILP-2P/900": "H", "VILP-2P/900 MA": "H",
 
     // Grupo I (VR-900 e Variações)
-    "VR1P/900": "I", "VR2P/900": "I", "VR2P/900 MA": "I", "VR2PA/900": "I",
+    "VR1P/900": "I", "VR2P/900": "I", "VR2P/900 MA": "I", "VR2PA/900": "I", "VRQU/900": "I", "VRQR/900": "I", "VRHB/900": "I",
 
-    // Grupo J (VR-1040 e Variações)
+
+    // Grupo J ()
     "VRA1P/1040": "J", "VRA2P/1040": "J", "VRAG (1,25) + VRA2P (2,50)/1040": "J",
-    "VRAG/1040": "J", "VRAGR/1040": "J",
+    "VRAG/1040": "J", "VRAGR/1040": "J", "VRAG(3,75) + VRAG1P (1,25)/1040": "J", "VRAG2N/900": "J", "VRAG (2,50) +VRA1P (1,25)/1040": "J",
+
+    // Grupo K ()
+    "VIL-2P PONTA CT 180/900": "K",
+
+    // Grupo L ()
+    "VIL-3P/900": "L",
+
+    // Grupo M ()
+    "ICDT": "M", "ICFT": "M",
+
+    // Grupo N ()
+    "VC2P/900": "N", "VCQU/900": "N",
+    
+    // Grupo O ()
+    "IRAS": "O",
+    
 };
 
 // === MAPA DE CORES PARA AGRUPAMENTO ===
 const GRUPO_COLORS = {
-    "A": "E0F7FA", // Azul Claro Suave
-    "B": "F1F8E9", // Verde Menta Suave
-    "C": "FFF3E0", // Âmbar Claro Suave
-    "D": "FBE4E4", // Rosa Claro Suave
-    "E": "E8EAF6", // Índigo Claro Suave
-    "F": "F3E5F5", // Roxo Claro Suave
-    "G": "E1F5FE", // Azul Bebê
-    "H": "FFE0B2", // Laranja Claro
-    "I": "DCF8C6", // Verde Limão
-    "J": "FCE4EC", // Rosa Pastel
+    "A": "E0F7FA", // Azul Claro Suave (Light Cyan)
+    "B": "F1F8E9", // Verde Menta Suave (Pale Green)
+    "C": "FFF3E0", // Âmbar Claro Suave (Very Pale Orange/Amber)
+    "D": "FBE4E4", // Rosa Claro Suave (Very Light Pink)
+    "E": "E8EAF6", // Índigo Claro Suave (Very Light Indigo)
+    "F": "F3E5F5", // Roxo Claro Suave (Very Light Purple/Lavender)
+    "G": "E1F5FE", // Azul Bebê (Very Light Blue)
+    "H": "FFE0B2", // Laranja Claro (Light Orange)
+    "I": "DCF8C6", // Verde Limão (Light Lime Green)
+    "J": "FCE4EC", // Rosa Pastel (Pale Pink)
+    "K": "FFFDE7", // **Amarelo Gema Muito Claro** (Very Light Yellow/Cream)
+    "L": "F0F4C3", // **Verde Oliva Muito Claro** (Very Light Olive/Lime)
+    "M": "E1BEE7", // **Malva/Lilás Pálido** (Pale Mauve/Light Purple)
+    "N": "B2EBF2", // **Ciano/Turquesa Claro** (Light Cyan/Turquoise)
+    "O": "FFCCBC", // **Pêssego/Coral Claro** (Light Peach/Coral)
+
     // Para grupos não mapeados (se o grupo for o próprio nome do modelo limpo)
     "N/A": "DDDDDD" 
 };
